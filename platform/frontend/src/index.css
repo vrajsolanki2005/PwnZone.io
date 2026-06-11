@@ -1,0 +1,43 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --sidebar-width: 230px;
+  --navbar-height: 56px;
+
+  /* Dark theme (default) */
+  --color-bg:           #0f1117;
+  --color-sidebar:      #13151c;
+  --color-navbar:       #13151c;
+  --color-border:       #1e2130;
+  --color-hover:        #1a1d2a;
+  --color-active-bg:    #1e2235;
+  --color-accent:       #7c6af7;
+  --color-text-primary: #e2e4f0;
+  --color-text-muted:   #6b7280;
+}
+
+[data-theme='light'] {
+  --color-bg:           #f5f6fa;
+  --color-sidebar:      #ffffff;
+  --color-navbar:       #ffffff;
+  --color-border:       #e2e4ec;
+  --color-hover:        #f0f1f8;
+  --color-active-bg:    #ede9ff;
+  --color-accent:       #6c55f5;
+  --color-text-primary: #111827;
+  --color-text-muted:   #6b7280;
+}
+
+body {
+  font-family: system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+}
+
+h1 { font-size: 24px; font-weight: 600; }
+h2 { font-size: 18px; font-weight: 600; }
