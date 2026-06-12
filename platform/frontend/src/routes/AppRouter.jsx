@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import DashboardLayout from '../layouts/DashboardLayout'
 import Dashboard from '../pages/Dashboard/Dashboard'
-import Labs from '../pages/Labs'
+import Labs from '../pages/Labs/Labs'
 // import Leaderboard from '../pages/Leaderboard'
 // import Profile from '../pages/Profile'
 // import Settings from '../pages/Settings'

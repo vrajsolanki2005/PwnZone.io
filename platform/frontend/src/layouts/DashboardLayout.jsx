@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import Sidebar from '../components/Sidebar/Sidebar'
 import Navbar from '../components/Navbar/Navbar'
+import Footer from '../components/Footer/Footer'
 import './DashboardLayout.css'
 
 export default function DashboardLayout() {
@@ -27,6 +28,7 @@ export default function DashboardLayout() {
         <Navbar onMenuToggle={() => setDrawerOpen((v) => !v)} />
         <main className="layout-content">
           <Outlet />
+          <Footer />
         </main>
       </div>
     </div>
