@@ -33,7 +33,7 @@
 }
 
 body {
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-primary, 'Plus Jakarta Sans', system-ui, sans-serif);
   -webkit-font-smoothing: antialiased;
   background: var(--color-bg);
   color: var(--color-text-primary);
