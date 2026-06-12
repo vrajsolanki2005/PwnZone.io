@@ -1,0 +1,20 @@
+.circ-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.circ-wrap svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.circ-label {
+  position: relative;
+  font-family: var(--font-primary);
+  font-size: var(--text-body);
+  font-weight: var(--weight-bold);
+  color: var(--clr-text-primary);
+}

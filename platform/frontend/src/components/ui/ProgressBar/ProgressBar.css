@@ -1,0 +1,16 @@
+.progress-track {
+  width: 100%;
+  background: var(--clr-border);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.progress-fill {
+  border-radius: var(--radius-full);
+}
+
+.progress-fill--purple { background: var(--grad-progress); }
+.progress-fill--blue   { background: var(--grad-blue); }
+.progress-fill--green  { background: var(--grad-green); }
+.progress-fill--orange { background: var(--grad-orange); }
+.progress-fill--pink   { background: var(--grad-pink); }

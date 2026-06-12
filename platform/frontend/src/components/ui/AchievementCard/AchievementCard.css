@@ -1,0 +1,65 @@
+.achievement-card {
+  border-radius: var(--radius-hero);
+  padding: 28px 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  color: #fff;
+  overflow: hidden;
+  position: relative;
+}
+
+.achievement-card::before {
+  content: '';
+  position: absolute;
+  top: -30px;
+  right: -30px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+  pointer-events: none;
+}
+
+.achievement-card--achievement { background: var(--grad-achievement); }
+.achievement-card--primary     { background: var(--grad-primary); }
+.achievement-card--blue        { background: var(--grad-blue); }
+.achievement-card--orange      { background: var(--grad-orange); }
+.achievement-card--green       { background: var(--grad-green); }
+.achievement-card--pink        { background: var(--grad-pink); }
+
+.achievement-icon-wrap {
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  backdrop-filter: blur(4px);
+}
+
+.achievement-icon {
+  font-size: 32px;
+}
+
+.achievement-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.achievement-title {
+  font-family: var(--font-primary);
+  font-size: var(--text-title);
+  font-weight: var(--weight-bold);
+  color: #fff;
+}
+
+.achievement-sub {
+  font-family: var(--font-secondary);
+  font-size: var(--text-body);
+  font-weight: var(--weight-medium);
+  color: rgba(255,255,255,0.75);
+}
