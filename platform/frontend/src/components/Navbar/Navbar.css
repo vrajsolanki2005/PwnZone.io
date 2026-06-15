@@ -27,9 +27,26 @@
   margin-left: auto;
 }
 
-.navbar-avatar {
+.navbar-avatar-btn {
+  background: none;
+  border: none;
+  padding: 0;
   cursor: pointer;
-  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  border-radius: 50%;
+  transition: opacity var(--t-base), box-shadow var(--t-base);
+}
+
+.navbar-avatar-btn:hover {
+  opacity: 0.85;
+  box-shadow: 0 0 0 2px var(--clr-purple-1);
+  border-radius: 50%;
+}
+
+.navbar-avatar {
+  width: 34px;
+  height: 34px;
 }
 
 .navbar-icon-btn {

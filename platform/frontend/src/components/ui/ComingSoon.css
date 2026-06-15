@@ -1,0 +1,136 @@
+.cs-root {
+  min-height: calc(100vh - var(--navbar-height) - 80px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Ambient background blobs */
+.cs-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.cs-blob-1 {
+  width: 400px;
+  height: 400px;
+  background: rgba(124, 106, 247, 0.12);
+  top: -80px;
+  left: -100px;
+}
+
+.cs-blob-2 {
+  width: 300px;
+  height: 300px;
+  background: rgba(16, 185, 129, 0.08);
+  bottom: -60px;
+  right: -80px;
+}
+
+.cs-card {
+  position: relative;
+  z-index: 1;
+  background: var(--color-sidebar);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  padding: 48px 40px;
+  max-width: 480px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  text-align: center;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.2);
+}
+
+.cs-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: var(--color-active-bg);
+  color: var(--color-accent);
+  border: 1px solid var(--color-accent);
+}
+
+.cs-icon {
+  font-size: 56px;
+  line-height: 1;
+  display: block;
+}
+
+.cs-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.cs-description {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+  max-width: 360px;
+}
+
+.cs-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  width: 100%;
+}
+
+.cs-feature-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  background: var(--color-hover);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 5px 10px;
+}
+
+.cs-check {
+  color: #10b981;
+  flex-shrink: 0;
+}
+
+.cs-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  padding: 11px 24px;
+  border-radius: 10px;
+  border: none;
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.cs-btn:hover { opacity: 0.85; }
+
+.cs-btn.notified {
+  background: #10b981;
+  cursor: default;
+  opacity: 1;
+}
