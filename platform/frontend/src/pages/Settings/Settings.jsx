@@ -1,7 +1,11 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { User, Palette, Bell, Shield, Trash2, Sun, Moon, Check, Eye, EyeOff } from 'lucide-react'
+import { User, Palette, Bell, Shield, Trash2, Sun, Moon, Check, Eye, EyeOff, LogOut } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import toast from 'react-hot-toast'
 import { useTheme } from '../../context/ThemeContext'
+import { useAuth } from '../../context/AuthContext'
+import { authApi } from '../../services/api'
 import './Settings.css'
 
 const SECTIONS = [
@@ -193,8 +197,24 @@ function SecuritySection() {
   const [showPass, setShowPass] = useState(false)
   const [twoFA, setTwoFA] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [loggingOut, setLoggingOut] = useState(false)
+  const { logout } = useAuth()
+  const navigate = useNavigate()
 
   const save = () => { setSaved(true); setTimeout(() => setSaved(false), 2000) }
+
+  const handleLogout = async () => {
+    setLoggingOut(true)
+    try {
+      await authApi.logout()
+      logout()
+      navigate('/login')
+    } catch {
+      toast.error('Logout failed. Please try again.')
+    } finally {
+      setLoggingOut(false)
+    }
+  }
 
   return (
     <>
@@ -236,6 +256,20 @@ function SecuritySection() {
             </motion.div>
           )}
         </AnimatePresence>
+      </SectionCard>
+      <SectionCard title="Sessions" desc="Manage your active sessions and sign out securely.">
+        <Field label="Current Session" hint="Active now">
+          <button className="st-btn st-btn--danger" onClick={handleLogout} disabled={loggingOut}>
+            <LogOut size={14} />
+            {loggingOut ? 'Signing out...' : 'Sign Out'}
+          </button>
+        </Field>
+        <Field label="Sign Out Everywhere" hint="Invalidates all tokens on all devices">
+          <button className="st-btn st-btn--warning" onClick={handleLogout} disabled={loggingOut}>
+            <LogOut size={14} />
+            {loggingOut ? 'Signing out...' : 'Sign Out All Devices'}
+          </button>
+        </Field>
       </SectionCard>
     </>
   )
