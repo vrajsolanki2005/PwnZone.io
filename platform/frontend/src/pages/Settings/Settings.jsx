@@ -1,11 +1,11 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { User, Palette, Bell, Shield, Trash2, Sun, Moon, Check, Eye, EyeOff, LogOut } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { useTheme } from '../../context/ThemeContext'
 import { useAuth } from '../../context/AuthContext'
-import { authApi } from '../../services/api'
+import { authApi, userApi } from '../../services/api'
 import './Settings.css'
 
 const SECTIONS = [
@@ -13,7 +13,7 @@ const SECTIONS = [
   { key: 'appearance',    label: 'Appearance',    icon: Palette },
   { key: 'notifications', label: 'Notifications', icon: Bell },
   { key: 'security',      label: 'Security',      icon: Shield },
-  { key: 'critical',      label: 'Criical Actions',   icon: Trash2, danger: true },
+  { key: 'danger',        label: 'Critical Actions',  icon: Trash2, danger: true },
 ]
 
 const fadeUp = {
@@ -56,52 +56,66 @@ function SectionCard({ title, desc, children }) {
 /* ── Section components ─────────────────────────────────── */
 
 function ProfileSection() {
-  const [form, setForm] = useState({ name: 'Jay Shah', handle: 'jayshah', email: 'jay@example.com', bio: 'Bug hunter · CTF player · Breaking things for fun and profit.', location: 'Ahmedabad, IN' })
+  const [form, setForm] = useState({ name: '', bio: '', location: '', github: '', twitter: '', email: '' })
   const [saved, setSaved] = useState(false)
+  const [loading, setLoading] = useState(true)
 
-  const save = () => { setSaved(true); setTimeout(() => setSaved(false), 2000) }
+  useEffect(() => {
+    userApi.getProfile().then(r => {
+      const u = r.data.user
+      setForm({ name: u.name || '', email: u.email || '', bio: u.bio || '', location: u.location || '', github: u.github || '', twitter: u.twitter || '' })
+    }).catch(() => {}).finally(() => setLoading(false))
+  }, [])
+
+  const save = async () => {
+    try {
+      await userApi.updateProfile({ name: form.name, bio: form.bio, location: form.location, github: form.github, twitter: form.twitter })
+      setSaved(true)
+      setTimeout(() => setSaved(false), 2000)
+    } catch { toast.error('Failed to save.') }
+  }
+
+  const initials = form.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
 
   return (
     <SectionCard title="Public Profile" desc="This information will be visible to other users.">
       <div className="st-avatar-row">
-        <div className="st-avatar">JS</div>
+        <div className="st-avatar">{initials || '?'}</div>
         <div>
           <button className="st-btn st-btn--secondary">Change Avatar</button>
           <p className="st-avatar-hint">JPG, PNG or GIF · max 2MB</p>
         </div>
       </div>
 
-      <div className="st-form">
-        {[
-          { key: 'name',     label: 'Display Name',  type: 'text' },
-          { key: 'handle',   label: 'Username',       type: 'text', prefix: '@' },
-          { key: 'email',    label: 'Email',          type: 'email' },
-          { key: 'location', label: 'Location',       type: 'text' },
-        ].map(f => (
-          <div key={f.key} className="st-input-wrap">
-            <label className="st-label">{f.label}</label>
-            <div className={`st-input-row${f.prefix ? ' has-prefix' : ''}`}>
-              {f.prefix && <span className="st-input-prefix">{f.prefix}</span>}
-              <input
-                className="st-input"
-                type={f.type}
-                value={form[f.key]}
-                onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))}
-              />
+      {loading ? <p style={{ color: 'var(--color-text-muted)', fontSize: 13 }}>Loading...</p> : (
+        <div className="st-form">
+          {[
+            { key: 'name',     label: 'Display Name', type: 'text' },
+            { key: 'email',    label: 'Email',         type: 'email', disabled: true },
+            { key: 'location', label: 'Location',      type: 'text' },
+            { key: 'github',   label: 'GitHub',        type: 'text' },
+            { key: 'twitter',  label: 'Twitter',       type: 'text', prefix: '@' },
+          ].map(f => (
+            <div key={f.key} className="st-input-wrap">
+              <label className="st-label">{f.label}</label>
+              <div className={`st-input-row${f.prefix ? ' has-prefix' : ''}`}>
+                {f.prefix && <span className="st-input-prefix">{f.prefix}</span>}
+                <input
+                  className="st-input"
+                  type={f.type}
+                  value={form[f.key]}
+                  disabled={f.disabled}
+                  onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))}
+                />
+              </div>
             </div>
+          ))}
+          <div className="st-input-wrap">
+            <label className="st-label">Bio</label>
+            <textarea className="st-input st-textarea" rows={3} value={form.bio} onChange={e => setForm(p => ({ ...p, bio: e.target.value }))} />
           </div>
-        ))}
-
-        <div className="st-input-wrap">
-          <label className="st-label">Bio</label>
-          <textarea
-            className="st-input st-textarea"
-            rows={3}
-            value={form.bio}
-            onChange={e => setForm(p => ({ ...p, bio: e.target.value }))}
-          />
         </div>
-      </div>
+      )}
 
       <div className="st-card__footer">
         <button className="st-btn st-btn--primary" onClick={save}>
@@ -198,10 +212,22 @@ function SecuritySection() {
   const [twoFA, setTwoFA] = useState(false)
   const [saved, setSaved] = useState(false)
   const [loggingOut, setLoggingOut] = useState(false)
+  const [form, setForm] = useState({ current: '', newPass: '', confirm: '' })
   const { logout } = useAuth()
   const navigate = useNavigate()
 
-  const save = () => { setSaved(true); setTimeout(() => setSaved(false), 2000) }
+  const save = async () => {
+    if (!form.current || !form.newPass)
+      return toast.error('All fields are required.')
+    try {
+      await userApi.changePassword({ currentPassword: form.current, newPassword: form.newPass })
+      setSaved(true)
+      setForm({ current: '', newPass: '', confirm: '' })
+      setTimeout(() => setSaved(false), 2000)
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to update password.')
+    }
+  }
 
   const handleLogout = async () => {
     setLoggingOut(true)
@@ -220,11 +246,21 @@ function SecuritySection() {
     <>
       <SectionCard title="Change Password" desc="Use a strong password you don't use elsewhere.">
         <div className="st-form">
-          {['Current Password', 'New Password', 'Confirm Password'].map(l => (
-            <div key={l} className="st-input-wrap">
-              <label className="st-label">{l}</label>
+          {[
+            { label: 'Current Password', key: 'current' },
+            { label: 'New Password',     key: 'newPass' },
+            { label: 'Confirm Password', key: 'confirm' },
+          ].map(f => (
+            <div key={f.key} className="st-input-wrap">
+              <label className="st-label">{f.label}</label>
               <div className="st-input-row st-input-row--icon">
-                <input className="st-input" type={showPass ? 'text' : 'password'} placeholder="••••••••" />
+                <input
+                  className="st-input"
+                  type={showPass ? 'text' : 'password'}
+                  placeholder="••••••••"
+                  value={form[f.key]}
+                  onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))}
+                />
                 <button className="st-input-eye" onClick={() => setShowPass(p => !p)}>
                   {showPass ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
@@ -277,6 +313,29 @@ function SecuritySection() {
 
 function DangerSection() {
   const [confirm, setConfirm] = useState('')
+  const [resetting, setResetting] = useState(false)
+  const [deleting,  setDeleting]  = useState(false)
+  const { logout } = useAuth()
+  const navigate   = useNavigate()
+
+  const handleReset = async () => {
+    setResetting(true)
+    try {
+      await userApi.resetProgress()
+      toast.success('Progress reset successfully.')
+    } catch { toast.error('Failed to reset progress.') }
+    finally { setResetting(false) }
+  }
+
+  const handleDelete = async () => {
+    setDeleting(true)
+    try {
+      await userApi.deleteAccount()
+      logout()
+      navigate('/login')
+    } catch { toast.error('Failed to delete account.') }
+    finally { setDeleting(false) }
+  }
   return (
     <motion.div className="st-card st-card--danger" variants={fadeUp}>
       <div className="st-card__header">
@@ -299,7 +358,9 @@ function DangerSection() {
             <p className="st-danger-label">Reset Progress</p>
             <p className="st-danger-desc">Wipe all solved labs and points. Cannot be undone.</p>
           </div>
-          <button className="st-btn st-btn--warning">Reset</button>
+          <button className="st-btn st-btn--warning" onClick={handleReset} disabled={resetting}>
+            {resetting ? 'Resetting...' : 'Reset'}
+          </button>
         </div>
 
         <div className="st-danger-divider" />
@@ -314,8 +375,8 @@ function DangerSection() {
               value={confirm}
               onChange={e => setConfirm(e.target.value)}
             />
-            <button className="st-btn st-btn--danger" disabled={confirm !== 'DELETE'}>
-              Delete Account
+            <button className="st-btn st-btn--danger" disabled={confirm !== 'DELETE' || deleting} onClick={handleDelete}>
+              {deleting ? 'Deleting...' : 'Delete Account'}
             </button>
           </div>
         </div>
