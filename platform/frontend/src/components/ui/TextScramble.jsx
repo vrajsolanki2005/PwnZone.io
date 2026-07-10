@@ -18,6 +18,10 @@ export default function TextScramble({
   const [displayText, setDisplayText] = useState(children)
   const [isAnimating, setIsAnimating] = useState(false)
 
+  useEffect(() => {
+    setDisplayText(children)
+  }, [children])
+
   const scramble = async () => {
     if (isAnimating) return
     setIsAnimating(true)
@@ -45,7 +49,7 @@ export default function TextScramble({
   useEffect(() => {
     if (!trigger) return
     scramble()
-  }, [trigger])
+  }, [trigger, children])
 
   return (
     <MotionComponent className={className} {...props}>
