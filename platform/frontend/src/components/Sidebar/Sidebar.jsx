@@ -1,8 +1,11 @@
 import { NavLink } from 'react-router-dom'
-import { NAV_ITEMS } from '../../constants/navigation'
+import { NAV_ITEMS, ADMIN_NAV_ITEM } from '../../constants/navigation'
+import { useAuth } from '../../context/AuthContext'
 import './Sidebar.css'
 
 export default function Sidebar({ onClose }) {
+  const { user } = useAuth()
+  const items = user?.is_admin ? [...NAV_ITEMS, ADMIN_NAV_ITEM] : NAV_ITEMS
   return (
     <aside className="sidebar">
       <div className="sidebar-logo">
@@ -14,7 +17,7 @@ export default function Sidebar({ onClose }) {
       </div>
 
       <nav className="sidebar-nav">
-        {NAV_ITEMS.map((item) => (
+        {items.map((item) => (
           <NavLink
             key={item.path}
             to={item.path}
