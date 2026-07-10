@@ -73,7 +73,6 @@ export default function Login() {
           <div className="auth-field">
             <div className="auth-field-header">
               <label>Password</label>
-              <Link to="/forgot-password" className="auth-forgot">Forgot password?</Link>
             </div>
             <div className="auth-input-wrap">
               <Lock size={16} className="auth-input-icon" />

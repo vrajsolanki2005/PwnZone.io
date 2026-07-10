@@ -17,7 +17,9 @@ const GithubIcon = ({ size = 14 }) => (
 )
 
 const PRIORITY_COLORS = { P1: '#ef4444', P2: '#FF9F43', P3: '#eab308', P4: '#22C55E' }
-const DAYS = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
+const DAYS      = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+const DAY_SHORT = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
+const WEEKS     = 18
 
 const stagger = { show: { transition: { staggerChildren: 0.07 } } }
 const fadeUp  = { hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: { duration: 0.35, ease: 'easeOut' } } }
@@ -33,31 +35,67 @@ function timeAgo(dateStr) {
   return `${days}d ago`
 }
 
-// Build 10-week heatmap grid from activity array [{ date, count }]
+// Get YYYY-MM-DD in IST for any JS Date
+function toIST(date) {
+  return new Date(date.getTime() + 5.5 * 60 * 60 * 1000).toISOString().slice(0, 10)
+}
+
+// Add N days to a YYYY-MM-DD string without timezone issues
+function addDays(dateStr, n) {
+  const [y, m, d] = dateStr.split('-').map(Number)
+  const dt = new Date(y, m - 1, d + n)
+  return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`
+}
+
+// Build heatmap — returns { grid: [[{date,count}]], months: [{label,col}] }
+// Grid always ends on today (IST). Last column = this week, last row = today's weekday.
 function buildHeatmap(activity) {
   const map = {}
-  activity.forEach(a => { map[a.date] = Math.min(Number(a.count), 4) })
+  activity.forEach(a => { map[a.date] = Math.min(a.count, 4) })
+
+  const todayStr = toIST(new Date())
+  // day-of-week index for today (0=Mon)
+  const todayDow = (new Date(todayStr + 'T12:00:00').getDay() + 6) % 7
+  // last cell is today, so last column ends at today
+  // total cells = WEEKS * 7, last cell index = WEEKS*7-1
+  // today sits at position (WEEKS-1)*7 + todayDow
+  const cellsFromStart = (WEEKS - 1) * 7 + todayDow
+  const startStr = addDays(todayStr, -cellsFromStart)
 
   const grid = []
-  const today = new Date()
-  // go back 69 days so we have 70 days total (10 weeks)
-  const start = new Date(today)
-  start.setDate(start.getDate() - 69)
-  // align to Monday
-  const dayOfWeek = (start.getDay() + 6) % 7 // 0=Mon
-  start.setDate(start.getDate() - dayOfWeek)
+  const months = []
+  let lastMonth = -1
 
-  for (let w = 0; w < 10; w++) {
+  for (let w = 0; w < WEEKS; w++) {
     const week = []
     for (let d = 0; d < 7; d++) {
-      const date = new Date(start)
-      date.setDate(start.getDate() + w * 7 + d)
-      const key = date.toISOString().slice(0, 10)
-      week.push(map[key] || 0)
+      const key = addDays(startStr, w * 7 + d)
+      // don't render future cells
+      const isFuture = key > todayStr
+      const month = Number(key.slice(5, 7))
+      if (d === 0 && month !== lastMonth) {
+        months.push({ label: new Date(key + 'T12:00:00').toLocaleString('default', { month: 'short' }), col: w })
+        lastMonth = month
+      }
+      week.push({ date: key, count: isFuture ? -1 : (map[key] || 0) })
     }
     grid.push(week)
   }
-  return grid
+  return { grid, months }
+}
+
+// Build last-7-days streak calendar in IST
+function buildWeekStreak(activity) {
+  const map = {}
+  activity.forEach(a => { map[a.date] = a.count })
+  const todayStr = toIST(new Date())
+  const days = []
+  for (let i = 6; i >= 0; i--) {
+    const key = addDays(todayStr, -i)
+    const dow = (new Date(key + 'T12:00:00').getDay() + 6) % 7
+    days.push({ label: DAYS[dow], date: key, active: (map[key] || 0) > 0 })
+  }
+  return days
 }
 
 export default function Profile() {
@@ -74,7 +112,8 @@ export default function Profile() {
   const xpInLevel = stats.total_points - stats.level_start
   const xpNeeded  = stats.level_end - stats.level_start
   const xpPct     = Math.min((xpInLevel / xpNeeded) * 100, 100)
-  const heatmap   = buildHeatmap(activity)
+  const { grid: heatmap, months } = buildHeatmap(activity)
+  const weekStreak = buildWeekStreak(activity)
   const initials  = user.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
 
   const STATS = [
@@ -179,6 +218,14 @@ export default function Profile() {
                   <span className="pf-streak__unit"> day streak</span>
                 </div>
               </div>
+              <div className="pf-streak__week">
+                {weekStreak.map((d) => (
+                  <div key={d.date} className={`pf-streak__day${d.active ? ' pf-streak__day--active' : ''}`}>
+                    <span className="pf-streak__day-dot" />
+                    <span className="pf-streak__day-label">{d.label}</span>
+                  </div>
+                ))}
+              </div>
               <div className="pf-streak__stats">
                 <div className="pf-streak__stat"><span>{stats.current_streak}</span><span>Current</span></div>
                 <div className="pf-streak__divider" />
@@ -196,24 +243,38 @@ export default function Profile() {
           <motion.div className="pf-card" variants={fadeUp}>
             <h2 className="pf-card__title">Activity</h2>
             <div className="pf-heatmap">
-              <div className="pf-heatmap__days">{DAYS.map((d, i) => <span key={i}>{d}</span>)}</div>
-              <div className="pf-heatmap__grid">
-                {heatmap.map((week, w) => (
-                  <div key={w} className="pf-heatmap__week">
-                    {week.map((v, d) => (
-                      <motion.div
-                        key={d}
-                        className="pf-heatmap__cell"
-                        data-level={v}
-                        initial={{ opacity: 0, scale: 0.5 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.01 * (w * 7 + d), duration: 0.2 }}
-                        title={`${v} lab${v !== 1 ? 's' : ''}`}
-                      />
-                    ))}
-                  </div>
+              <div className="pf-heatmap__month-row">
+                {months.map((m, i) => (
+                  <span key={i} className="pf-heatmap__month" style={{ gridColumn: m.col + 1 }}>{m.label}</span>
                 ))}
               </div>
+              <div className="pf-heatmap__inner">
+                <div className="pf-heatmap__days">
+                  {DAY_SHORT.map((d, i) => <span key={i}>{i % 2 === 0 ? d : ''}</span>)}
+                </div>
+                <div className="pf-heatmap__grid">
+                  {heatmap.map((week, w) => (
+                    <div key={w} className="pf-heatmap__week">
+                      {week.map((cell, d) => (
+                        <motion.div
+                          key={d}
+                          className="pf-heatmap__cell"
+                          data-level={cell.count}
+                          initial={{ opacity: 0, scale: 0.5 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: 0.005 * (w * 7 + d), duration: 0.2 }}
+                          title={cell.count >= 0 ? `${cell.date}: ${cell.count} lab${cell.count !== 1 ? 's' : ''}` : ''}
+                        />
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="pf-heatmap__legend">
+              <span>Less</span>
+              {[0,1,2,3,4].map(l => <span key={l} className="pf-heatmap__cell" data-level={l} />)}
+              <span>More</span>
             </div>
           </motion.div>
 

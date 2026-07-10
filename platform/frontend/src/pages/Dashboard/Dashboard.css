@@ -4,6 +4,20 @@
   gap: 24px;
 }
 
+.dashboard-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 60px 24px;
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+.dashboard-state--error {
+  color: #ef4444;
+}
+
 .dashboard-header {
   display: flex;
   flex-direction: column;
@@ -619,4 +633,111 @@
   font-family: ui-monospace, monospace;
   color: var(--color-text-muted);
   font-weight: 600;
+}
+
+/* Recommendations */
+.recommendations {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.rec-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.rec-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rec-icon {
+  color: var(--color-accent);
+}
+
+.rec-view-all {
+  font-size: 12px;
+  color: var(--color-accent);
+  text-decoration: none;
+  font-weight: 600;
+  transition: opacity 0.15s;
+}
+.rec-view-all:hover { opacity: 0.75; }
+
+.rec-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 1024px) { .rec-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px)  { .rec-grid { grid-template-columns: 1fr; } }
+
+.rec-card {
+  background: var(--color-sidebar);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+
+.rec-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+  border-color: var(--color-accent);
+}
+
+.rec-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.rec-card__priority {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.rec-card__points {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.rec-card__title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.rec-card__category {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  background: rgba(108,99,255,0.10);
+  color: var(--color-accent);
+  padding: 3px 10px;
+  border-radius: 999px;
+  align-self: flex-start;
+}
+
+.rec-card__footer {
+  margin-top: auto;
+  padding-top: 10px;
+}
+
+.rec-card__cta {
+  font-size: 12px;
+  font-weight: 700;
 }
