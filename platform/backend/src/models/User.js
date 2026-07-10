@@ -16,11 +16,6 @@ const User = {
     return rows[0] || null;
   },
 
-  async findById(id) {
-    const [rows] = await pool.query('SELECT * FROM users WHERE id = ?', [id]);
-    return rows[0] || null;
-  },
-
   async incrementTokenVersion(id) {
     await pool.query('UPDATE users SET token_version = token_version + 1 WHERE id = ?', [id]);
   },
