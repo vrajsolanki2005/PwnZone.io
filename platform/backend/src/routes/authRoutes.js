@@ -12,11 +12,5 @@ router.get('/google/callback',
 );
 router.get('/me', authMiddleware, getAuthUser);
 router.post('/logout', authMiddleware, logoutUser);
-router.post('/logout', authMiddleware, (req, res) => {
-  req.logout(() => {
-    res.clearCookie('jwt');
-    res.json({ message: 'Logged out successfully' });
-  });
-});
 
 module.exports = router;
