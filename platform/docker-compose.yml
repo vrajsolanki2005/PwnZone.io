@@ -1,0 +1,57 @@
+services:
+
+  db:
+    image: mysql:8
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: Vr@j#0120
+      MYSQL_DATABASE: hackonymous
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./backend/database/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-pVr@j#0120"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      CLIENT_URL: http://localhost
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: "Vr@j#0120"
+      DB_NAME: hackonymous
+      JWT_SECRET: mohanlal
+      SESSION_SECRET: your_session_secret_change_this
+      GOOGLE_CLIENT_ID: 433007082100-gn938f6gmt9iad7dqpb7fgq8thpsabcs.apps.googleusercontent.com
+      GOOGLE_CLIENT_SECRET: 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 
+      GOOGLE_CALLBACK_URL: http://localhost/api/auth/google/callback
+    cap_add:
+      - NET_RAW
+      - NET_ADMIN
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE_URL: /api
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+
+volumes:
+  db_data:
