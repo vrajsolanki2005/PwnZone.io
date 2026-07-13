@@ -1,33 +1,43 @@
-import React, {useState} from "react";
+import { useState } from 'react'
+import { Send } from 'lucide-react'
 
 export default function ChatInput({ onSend, isLoading }) {
-    const [inputValue, setInputValue] = useState("");
+  const [value, setValue] = useState('')
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (inputValue.trim() && !isLoading) {
-            onSend(inputValue.trim());
-            setInputValue("");
-        }
-    };
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    if (value.trim() && !isLoading) {
+      onSend(value.trim())
+      setValue('')
+    }
+  }
 
-    return (
-        <form onSubmit={handleSubmit} className="flex items-center p-4 border-t border-gray-300">
-            <input
-                type="text"
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                placeholder="Type your message..."
-                className="flex-1 bg-gray-100 text-gray-800 placeholder:text-gray-500 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                disabled={isLoading}
-            />
-            <button
-                type="submit"
-                className="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                disabled={isLoading || !inputValue.trim()}
-            >
-                Send
-            </button>
-        </form>
-    );
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      handleSubmit(e)
+    }
+  }
+
+  return (
+    <form className="aim-input-form" onSubmit={handleSubmit}>
+      <input
+        className="aim-input"
+        type="text"
+        placeholder="Ask a cybersecurity question..."
+        value={value}
+        onChange={e => setValue(e.target.value)}
+        onKeyDown={handleKeyDown}
+        disabled={isLoading}
+        autoComplete="off"
+      />
+      <button
+        className="aim-send-btn"
+        type="submit"
+        disabled={isLoading || !value.trim()}
+      >
+        <Send size={16} />
+      </button>
+    </form>
+  )
 }

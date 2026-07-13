@@ -1,31 +1,29 @@
-import React from "react";
-
 const DEFAULT_QUESTIONS = [
-    "Explain SQL Injection",
-    "What is Cross-Site Scripting (XSS)?",
-    "How does a firewall work?",
-    "Explain JWT",
-    "OWASP Top 10 vulnerabilities",
-    "How to become a Bug Bounty Hunter?",
-];
+  'What is SQL Injection and how to prevent it?',
+  'Explain Cross-Site Scripting (XSS)',
+  'How does JWT authentication work?',
+  'OWASP Top 10 vulnerabilities explained',
+  'How to start Bug Bounty hunting?',
+  'What is SSRF and how to exploit it?',
+  'Explain IDOR vulnerability',
+  'How does CSRF attack work?',
+]
 
 export default function SuggestedQuestions({ onSelectQuestion, questions = DEFAULT_QUESTIONS }) {
-    return (
-        <div className="px-4 py-3">
-            <p className="text-xs font-medium text-gray-500 mb-2 uppercase tracking-wide">
-                Try these:
-            </p>
-            <div className="flex flex-wrap gap-2">
-                {questions.map((question, index) => (
-                    <button
-                        key={index}
-                        onClick={() => onSelectQuestion(question)}
-                        className="text-xs bg-gray-200 text-gray-700 px-3 py-1 rounded-full hover:bg-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-400 transition-colors"
-                    >
-                        {question}
-                    </button>
-                ))}
-            </div>
-        </div>
-    );
+  return (
+    <div className="aim-suggestions">
+      <p className="aim-suggestions__label">Try asking:</p>
+      <div className="aim-suggestions__list">
+        {questions.map((q, i) => (
+          <button
+            key={i}
+            className="aim-suggestion-btn"
+            onClick={() => onSelectQuestion(q)}
+          >
+            {q}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
 }

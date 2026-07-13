@@ -1,19 +1,30 @@
-import React from "react";
+import { Bot, User } from 'lucide-react'
+import ReactMarkdown from 'react-markdown'
 
 export default function ChatMessage({ role, message }) {
-    const isUser = role === "user";
+  const isUser = role === 'user'
 
-    return(
-        <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
-            <div className={`max-w-xs px-4 py-2 rounded-lg ${
-                isUser 
-                ? "bg-blue-500 text-white rounded-bl-sm rounded-tr-sm" 
-                : "bg-gray-200 text-gray-800 rounded-br-sm rounded-tl-sm"
-                }`}
-            >
-                {!isUser && <div className="text-sm font-semibold mb-1">AI Mentor</div>}
-                <div className="text-sm">{message}</div>
-            </div>
+  return (
+    <div className={`aim-msg ${isUser ? 'aim-msg--user' : 'aim-msg--ai'}`}>
+      {!isUser && (
+        <div className="aim-msg__avatar aim-msg__avatar--ai">
+          <Bot size={14} />
         </div>
-    )
+      )}
+      <div className={`aim-msg__bubble ${isUser ? 'aim-msg__bubble--user' : 'aim-msg__bubble--ai'}`}>
+        {isUser ? (
+          <p className="aim-msg__text">{message}</p>
+        ) : (
+          <div className="aim-msg__markdown">
+            <ReactMarkdown>{message}</ReactMarkdown>
+          </div>
+        )}
+      </div>
+      {isUser && (
+        <div className="aim-msg__avatar aim-msg__avatar--user">
+          <User size={14} />
+        </div>
+      )}
+    </div>
+  )
 }
