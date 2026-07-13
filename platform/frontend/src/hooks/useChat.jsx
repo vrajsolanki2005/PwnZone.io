@@ -1,5 +1,5 @@
 import {useState, useCallback} from "react";
-import { sendChatMessage } from "../api/aiMentorApi";
+import { sendChatMessage } from "../services/aiApi";
 
 /**
  * Manage chat message state +talking to the backend API.
