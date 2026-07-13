@@ -20,6 +20,7 @@ app.use('/api/users',       require('./routes/userRoutes'));
 app.use('/api/leaderboard', require('./routes/leaderboardRoutes'));
 app.use('/api/recon',       require('./routes/reconRoutes'));
 app.use('/api/admin',       require('./routes/adminRoutes'));
+app.use('/api/ai',          require('./routes/aiRoutes'));
 
 app.get('/health', (_, res) => res.json({ status: 'ok' }));
 
