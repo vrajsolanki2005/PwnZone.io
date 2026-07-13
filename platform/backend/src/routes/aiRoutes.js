@@ -1,8 +1,8 @@
 const router = require('express').Router();
-const { authenticate } = require('../middleware/authMiddleware');
+const auth = require('../middleware/authMiddleware');
 const aiLimiter = require('../middleware/aiLimiter');
 const { chatHandler } = require('../controllers/aiController');
 
-router.post('/chat', authenticate, aiLimiter, chatHandler);
+router.post('/chat', auth, aiLimiter, chatHandler);
 
 module.exports = router;
