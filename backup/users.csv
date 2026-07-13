@@ -1,0 +1,4 @@
+id,name,email,password,phone,google_id,avatar,provider,role,is_verified,created_at,updated_at,token_version,current_streak,max_streak,last_activity_date,bio,location,github,twitter
+1,"Deepest Goods",deepestgooda810@gmail.com,NULL,NULL,111333469980445720293,https://api.dicebear.com/9.x/adventurer/svg?seed=Deepest%20Gooda,google,user,0,"2026-06-15 23:00:26","2026-07-05 15:35:16",7,2,2,2026-07-04,NULL,NULL,vrajsolanki2005,NULL
+2,"Jay Shah",shahjay378@gmail.com,$2b$12$JyL4bqZmd9Yow2TGjpd5Gez4htabZjnQ0fFszqT1mD/Dq0nSAOW3W,NULL,NULL,https://api.dicebear.com/9.x/adventurer/svg?seed=Jay%20Shah,local,user,0,"2026-06-15 23:29:58","2026-06-15 23:30:07",1,0,0,NULL,NULL,NULL,NULL,NULL
+3,"Hiral patel",hiralpatel.cse.kset@kpgu.ac.in,$2b$12$pdgqDRl/OrFP08mujYWcIeOEqSiai3M5aoUf783zcDYQcv73Ol3xu,NULL,NULL,https://api.dicebear.com/9.x/adventurer/svg?seed=Hiral%20patel,local,user,0,"2026-07-02 10:13:10","2026-07-02 10:18:25",1,0,0,NULL,NULL,NULL,NULL,NULL
