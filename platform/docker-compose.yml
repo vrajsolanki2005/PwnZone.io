@@ -38,6 +38,8 @@ services:
       GOOGLE_CLIENT_ID: 433007082100-gn938f6gmt9iad7dqpb7fgq8thpsabcs.apps.googleusercontent.com
       GOOGLE_CLIENT_SECRET: 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 
       GOOGLE_CALLBACK_URL: http://localhost/api/auth/google/callback
+      GROQ_API_KEY: your_groq_api_key_here
+      GROQ_API_KEY : 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
     cap_add:
       - NET_RAW
       - NET_ADMIN

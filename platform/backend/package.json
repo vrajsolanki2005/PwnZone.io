@@ -15,7 +15,7 @@
   "author": "Vraj Solanki",
   "license": "ISC",
   "dependencies": {
-    "@google/generative-ai": "^0.24.1",
+    "groq-sdk": "^0.9.1",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",

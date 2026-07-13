@@ -1,23 +1,23 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const Groq = require('groq-sdk');
 const SYSTEM_PROMPT = require('../prompts/systemPrompt');
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 async function chat(message, history = []) {
-  const model = genAI.getGenerativeModel({
-    model: 'gemini-1.5-flash',
-    systemInstruction: SYSTEM_PROMPT,
+  const messages = [
+    { role: 'system', content: SYSTEM_PROMPT },
+    ...history.map(h => ({ role: h.role === 'assistant' ? 'assistant' : 'user', content: h.text })),
+    { role: 'user', content: message },
+  ];
+
+  const completion = await groq.chat.completions.create({
+    model: 'llama-3.3-70b-versatile',
+    messages,
+    temperature: 0.7,
+    max_tokens: 1024,
   });
 
-  // Convert history to Gemini format
-  const geminiHistory = history.map(h => ({
-    role: h.role === 'assistant' ? 'model' : 'user',
-    parts: [{ text: h.text }],
-  }));
-
-  const chatSession = model.startChat({ history: geminiHistory });
-  const result = await chatSession.sendMessage(message);
-  return result.response.text();
+  return completion.choices[0].message.content;
 }
 
 module.exports = { chat };
