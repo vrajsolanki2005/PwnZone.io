@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AcmeCorp — Employee Portal</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: #0f1117;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      color: #e2e8f0;
+    }
+
+    /* subtle grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(99,102,241,.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(99,102,241,.06) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 420px;
+      background: #1a1d27;
+      border: 1px solid #2d3148;
+      border-radius: 16px;
+      padding: 40px 36px;
+      box-shadow: 0 25px 60px rgba(0,0,0,.5);
+      position: relative;
+      z-index: 1;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+    .logo-icon {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .logo-text { font-size: 18px; font-weight: 700; color: #f1f5f9; }
+    .logo-sub  { font-size: 11px; color: #64748b; letter-spacing: .5px; text-transform: uppercase; }
+
+    h1 { font-size: 22px; font-weight: 700; color: #f1f5f9; margin-bottom: 6px; }
+    .subtitle { font-size: 13px; color: #64748b; margin-bottom: 28px; }
+
+    .lab-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(239,68,68,.12);
+      border: 1px solid rgba(239,68,68,.3);
+      color: #f87171;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-bottom: 24px;
+      letter-spacing: .4px;
+      text-transform: uppercase;
+    }
+    .lab-badge::before { content: '⚠'; font-size: 12px; }
+
+    label { display: block; font-size: 12px; font-weight: 600; color: #94a3b8; margin-bottom: 6px; letter-spacing: .4px; text-transform: uppercase; }
+
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      background: #0f1117;
+      border: 1px solid #2d3148;
+      border-radius: 8px;
+      padding: 11px 14px;
+      font-size: 14px;
+      color: #e2e8f0;
+      outline: none;
+      transition: border-color .2s;
+      margin-bottom: 18px;
+    }
+    input:focus { border-color: #6366f1; }
+    input::placeholder { color: #475569; }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity .2s, transform .1s;
+      margin-top: 4px;
+    }
+    .btn:hover   { opacity: .9; }
+    .btn:active  { transform: scale(.98); }
+    .btn:disabled { opacity: .5; cursor: not-allowed; }
+
+    /* Alert boxes */
+    .alert {
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 13px;
+      margin-top: 18px;
+      display: none;
+      line-height: 1.5;
+    }
+    .alert.show { display: block; }
+    .alert-error   { background: rgba(239,68,68,.1);  border: 1px solid rgba(239,68,68,.3);  color: #fca5a5; }
+    .alert-success { background: rgba(34,197,94,.1);  border: 1px solid rgba(34,197,94,.3);  color: #86efac; }
+    .alert-sql     { background: rgba(251,191,36,.08); border: 1px solid rgba(251,191,36,.3); color: #fde68a; font-family: monospace; font-size: 12px; }
+
+    /* Dashboard (shown after bypass) */
+    #dashboard {
+      display: none;
+      text-align: center;
+    }
+    #dashboard.show { display: block; }
+    #login-section.hide { display: none; }
+
+    .congrats-icon { font-size: 52px; margin-bottom: 16px; }
+    .congrats-title { font-size: 22px; font-weight: 700; color: #f1f5f9; margin-bottom: 8px; }
+    .congrats-sub   { font-size: 13px; color: #64748b; margin-bottom: 24px; }
+
+    .flag-box {
+      background: #0f1117;
+      border: 1px solid #22c55e;
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+    }
+    .flag-label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+    .flag-value {
+      font-family: 'Courier New', monospace;
+      font-size: 17px;
+      font-weight: 700;
+      color: #22c55e;
+      letter-spacing: 1px;
+      word-break: break-all;
+    }
+
+    .copy-btn {
+      background: rgba(34,197,94,.12);
+      border: 1px solid rgba(34,197,94,.3);
+      color: #86efac;
+      border-radius: 6px;
+      padding: 7px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s;
+      margin-bottom: 20px;
+    }
+    .copy-btn:hover { background: rgba(34,197,94,.2); }
+
+    .back-btn {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 13px;
+      color: #6366f1;
+      text-decoration: none;
+      cursor: pointer;
+      background: none;
+      border: none;
+    }
+    .back-btn:hover { text-decoration: underline; }
+
+    .payload-info {
+      background: rgba(99,102,241,.08);
+      border: 1px solid rgba(99,102,241,.2);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 12px;
+      color: #a5b4fc;
+      text-align: left;
+      margin-bottom: 16px;
+      font-family: monospace;
+    }
+    .payload-info strong { color: #c7d2fe; display: block; margin-bottom: 4px; font-size: 11px; text-transform: uppercase; letter-spacing: .4px; }
+
+    .divider { border: none; border-top: 1px solid #2d3148; margin: 20px 0; }
+  </style>
+</head>
+<body>
+
+<div class="card">
+
+  <!-- LOGIN SECTION -->
+  <div id="login-section">
+    <div class="logo">
+      <div class="logo-icon">🏢</div>
+      <div>
+        <div class="logo-text">AcmeCorp</div>
+        <div class="logo-sub">Employee Portal</div>
+      </div>
+    </div>
+
+    <div class="lab-badge">PwnZone Lab — SQL Injection</div>
+
+    <h1>Sign in</h1>
+    <p class="subtitle">Enter your credentials to access the portal.</p>
+
+    <form id="login-form">
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" placeholder="e.g. admin" autocomplete="off" />
+
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" placeholder="••••••••" autocomplete="off" />
+
+      <button class="btn" type="submit" id="submit-btn">Sign In</button>
+    </form>
+
+    <div class="alert alert-error"   id="alert-error"></div>
+    <div class="alert alert-sql"     id="alert-sql"></div>
+    <div class="alert alert-success" id="alert-normal-login"></div>
+  </div>
+
+  <!-- DASHBOARD (shown after successful SQLi bypass) -->
+  <div id="dashboard">
+    <div class="congrats-icon">🎉</div>
+    <div class="congrats-title">Authentication Bypassed!</div>
+    <div class="congrats-sub">You successfully exploited the SQL Injection vulnerability.</div>
+
+    <div class="flag-box">
+      <div class="flag-label">🚩 Your Flag</div>
+      <div class="flag-value" id="flag-display"></div>
+    </div>
+
+    <button class="copy-btn" onclick="copyFlag()">📋 Copy Flag</button>
+
+    <div class="payload-info">
+      <strong>Payload Used</strong>
+      <span id="payload-display"></span>
+    </div>
+
+    <hr class="divider" />
+    <p style="font-size:12px;color:#64748b;margin-bottom:12px;">
+      Submit this flag on the PwnZone platform to earn your points.
+    </p>
+    <button class="back-btn" onclick="window.close()">← Return to PwnZone</button>
+  </div>
+
+</div>
+
+<script>
+  const form       = document.getElementById('login-form');
+  const submitBtn  = document.getElementById('submit-btn');
+  const alertError = document.getElementById('alert-error');
+  const alertSql   = document.getElementById('alert-sql');
+  const alertNorm  = document.getElementById('alert-normal-login');
+
+  function clearAlerts() {
+    [alertError, alertSql, alertNorm].forEach(el => { el.classList.remove('show'); el.textContent = ''; });
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearAlerts();
+
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
+
+    if (!username || !password) {
+      alertError.textContent = 'Please enter both username and password.';
+      alertError.classList.add('show');
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Signing in…';
+
+    try {
+      const res  = await fetch('/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        if (data.hint) {
+          // SQL error — show the raw error to help students debug their payload
+          alertSql.innerHTML = `<strong>SQL Error (your payload was parsed):</strong><br>${escHtml(data.message)}<br><br><em>${escHtml(data.hint)}</em>`;
+          alertSql.classList.add('show');
+        } else {
+          alertError.textContent = data.message || 'Invalid credentials.';
+          alertError.classList.add('show');
+        }
+        return;
+      }
+
+      if (data.injected && data.flag) {
+        // Show the dashboard with the flag
+        document.getElementById('flag-display').textContent   = data.flag;
+        document.getElementById('payload-display').textContent = `username: ${username}  |  password: ${password}`;
+        document.getElementById('login-section').classList.add('hide');
+        document.getElementById('dashboard').classList.add('show');
+      } else {
+        // Normal login — no flag
+        alertNorm.textContent = `${data.message} (No flag — try SQL injection to bypass authentication!)`;
+        alertNorm.classList.add('show');
+      }
+    } catch (err) {
+      alertError.textContent = 'Network error. Is the lab server running?';
+      alertError.classList.add('show');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Sign In';
+    }
+  });
+
+  function copyFlag() {
+    const flag = document.getElementById('flag-display').textContent;
+    navigator.clipboard.writeText(flag).then(() => {
+      const btn = document.querySelector('.copy-btn');
+      btn.textContent = '✅ Copied!';
+      setTimeout(() => btn.textContent = '📋 Copy Flag', 2000);
+    });
+  }
+
+  function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+</script>
+</body>
+</html>
