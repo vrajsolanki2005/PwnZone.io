@@ -66,4 +66,4 @@ export const adminApi = {
   deleteLab:         (id)      => api.delete(`/admin/labs/${id}`),
 }
 
-export default api
+export default api;

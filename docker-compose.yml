@@ -1,0 +1,69 @@
+services:
+
+  # ── Database ───────────────────────────────────────────────
+  db:
+    image: mysql:8
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./platform/backend/database/init:/docker-entrypoint-initdb.d
+    ports:
+      - "3307:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # ── Platform Backend ───────────────────────────────────────
+  backend:
+    build: ./platform/backend
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    expose:
+      - "3000"
+    environment:
+      PORT: ${PORT}
+      CLIENT_URL: ${CLIENT_URL}
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      JWT_SECRET: ${JWT_SECRET}
+      SESSION_SECRET: ${SESSION_SECRET}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_CALLBACK_URL: ${GOOGLE_CALLBACK_URL}
+      GROQ_API_KEY: ${GROQ_API_KEY}
+
+  # ── Platform Frontend (nginx) ──────────────────────────────
+  frontend:
+    build:
+      context: ./platform/frontend
+      args:
+        VITE_API_BASE_URL: /api
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+
+  # ── Vulnerable Labs ────────────────────────────────────────
+  # Each lab is internal-only (expose, not ports).
+  # nginx proxies /labs/tm-XX/* → container.
+  # To add a new lab: add service here + nginx location block.
+
+  sqli-auth:                          # tm-01
+    build: ./vulnerable/sqli-auth
+    restart: always
+    expose:
+      - "5174"
+
+volumes:
+  db_data:

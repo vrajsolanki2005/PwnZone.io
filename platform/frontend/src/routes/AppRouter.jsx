@@ -5,10 +5,12 @@ import ProtectedRoute from './ProtectedRoute'
 import Login        from '../pages/Auth/Login'
 import Signup       from '../pages/Auth/Signup'
 import AuthCallback from '../pages/Auth/AuthCallback'
+import CompleteProfile from '../pages/Auth/CompleteProfile'
 
 import Dashboard   from '../pages/Dashboard/Dashboard'
 import Labs        from '../pages/Labs/Labs'
 import LabInfo     from '../pages/LabInfo/LabInfo'
+import LabStart    from '../pages/LabInfo/LabStart'
 import Leaderboard from '../pages/Leaderboard/Leaderboard'
 import Paths       from '../pages/Paths/Paths'
 import Certificates from '../pages/Certificates/Certificates'
@@ -25,15 +27,17 @@ export default function AppRouter() {
     <BrowserRouter>
       <Routes>
         {/* Public auth routes */}
-        <Route path="/login"          element={<Login />} />
-        <Route path="/signup"         element={<Signup />} />
-        <Route path="/auth/callback"  element={<AuthCallback />} />
+        <Route path="/login"              element={<Login />} />
+        <Route path="/signup"             element={<Signup />} />
+        <Route path="/auth/callback"      element={<AuthCallback />} />
+        <Route path="/complete-profile"   element={<CompleteProfile />} />
 
         {/* Protected dashboard routes */}
         <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
           <Route path="/"              element={<Dashboard />} />
           <Route path="/labs"          element={<Labs />} />
-          <Route path="/labs/:slug"    element={<LabInfo />} />
+          <Route path="/labs/:slug"       element={<LabInfo />} />
+          <Route path="/labs/:slug/start" element={<LabStart />} />
           <Route path="/leaderboard"   element={<Leaderboard />} />
           <Route path="/paths"          element={<Paths />} />
           <Route path="/certificates"  element={<Certificates />} />

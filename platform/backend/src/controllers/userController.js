@@ -138,6 +138,20 @@ const getProfile = async (req, res) => {
   }
 };
 
+// PATCH /api/users/phone
+const updatePhone = async (req, res) => {
+  try {
+    const { phone } = req.body;
+    if (!phone) return res.status(400).json({ message: 'Phone number is required.' });
+    const PHONE_RE = /^\+?[1-9]\d{6,14}$/;
+    if (!PHONE_RE.test(phone)) return res.status(400).json({ message: 'Invalid phone number.' });
+    await pool.query('UPDATE users SET phone = ? WHERE id = ?', [phone, req.user.id]);
+    res.json({ message: 'Phone number saved.' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 // PATCH /api/users/profile
 const updateProfile = async (req, res) => {
   try {
@@ -194,4 +208,4 @@ const deleteAccount = async (req, res) => {
   }
 };
 
-module.exports = { getProfile, updateProfile, changePassword, resetProgress, deleteAccount };
+module.exports = { getProfile, updateProfile, updatePhone, changePassword, resetProgress, deleteAccount };

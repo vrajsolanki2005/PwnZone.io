@@ -3,13 +3,13 @@ const User = require('../models/User');
 const pool = require('../config/db');
 const { sign } = require('./jwtService');
 
-const register = async ({ name, email, password }) => {
+const register = async ({ name, email, password, phone }) => {
   if (await User.findByEmail(email)) {
     const err = new Error('Email already in use.'); err.status = 409; throw err;
   }
   const hashed = await bcrypt.hash(password, 12);
   const avatar = `https://api.dicebear.com/9.x/adventurer/svg?seed=${encodeURIComponent(name)}`;
-  const user = await User.create({ name, email, password: hashed, avatar, provider: 'local' });
+  const user = await User.create({ name, email, password: hashed, avatar, phone, provider: 'local' });
   return { token: sign(user), user: { id: user.id, name, email, avatar } };
 };
 

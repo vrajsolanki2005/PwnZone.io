@@ -27,10 +27,10 @@ const User = {
     );
   },
 
-  async create({ name, email, password, avatar, google_id, provider }) {
+  async create({ name, email, password, avatar, google_id, provider, phone }) {
     const [result] = await pool.query(
-      'INSERT INTO users (name, email, password, avatar, google_id, provider) VALUES (?, ?, ?, ?, ?, ?)',
-      [name, email, password || null, avatar || null, google_id || null, provider || 'local']
+      'INSERT INTO users (name, email, password, avatar, google_id, provider, phone) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [name, email, password || null, avatar || null, google_id || null, provider || 'local', phone || null]
     );
     return { id: result.insertId, name, email, avatar, provider };
   },

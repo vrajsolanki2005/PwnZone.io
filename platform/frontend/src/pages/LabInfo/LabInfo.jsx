@@ -227,6 +227,7 @@ export default function LabInfo() {
   const [flagState, setFlagState]     = useState(null)   // null | 'success' | 'error'
   const [flagMsg, setFlagMsg]         = useState('')
   const [submitting, setSubmitting]   = useState(false)
+  const [labOnline, setLabOnline]     = useState(null)   // null | true | false
 
   useEffect(() => {
     labApi.getOne(slug)
@@ -239,6 +240,17 @@ export default function LabInfo() {
     progressApi.map()
       .then(r => { if (r.data[String(lab.id)] === 'COMPLETED') setStatus('COMPLETED') })
       .catch(() => {})
+  }, [lab])
+
+  useEffect(() => {
+    if (!lab?.lab_url?.startsWith('http')) return
+    const ctrl = new AbortController()
+    const timer = setTimeout(() => ctrl.abort(), 4000)
+    const origin = new URL(lab.lab_url).origin
+    fetch(`${origin}/health`, { signal: ctrl.signal })
+      .then(r => setLabOnline(r.ok))
+      .catch(() => setLabOnline(false))
+      .finally(() => clearTimeout(timer))
   }, [lab])
 
   const unlockHint = (i) => {
@@ -426,14 +438,23 @@ export default function LabInfo() {
       {/* Actions */}
       <motion.div variants={fadeUp}>
         <div className="li-actions">
-          <a
+          {lab.lab_url?.startsWith('http') && (
+            <div className="li-server-status">
+              <span className={`li-server-dot ${
+                labOnline === null ? 'li-server-dot--checking' :
+                labOnline ? 'li-server-dot--online' : 'li-server-dot--offline'
+              }`} />
+              {labOnline === null ? 'Checking lab server…' :
+               labOnline ? 'Lab Server Online' : 'Lab Server Offline'}
+            </div>
+          )}
+          <button
             className="li-btn li-btn--primary"
-            href={lab.lab_url}
-            target="_blank"
-            rel="noopener noreferrer"
+            onClick={() => navigate(`/labs/${slug}/start`)}
+            disabled={lab.lab_url?.startsWith('http') && labOnline === false}
           >
             <Play size={14} /> Launch Lab
-          </a>
+          </button>
         </div>
 
         {/* Flag Submit */}

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Mail, Lock, Eye, EyeOff, User } from 'lucide-react'
+import { Mail, Lock, Eye, EyeOff, User, Phone } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useAuth } from '../../context/AuthContext'
 import { authApi } from '../../services/api'
@@ -17,21 +17,42 @@ const GoogleIcon = () => (
 )
 
 export default function Signup() {
-  const [form, setForm]         = useState({ name: '', email: '', password: '', confirm: '' })
+  const [form, setForm]         = useState({ name: '', email: '', phone: '', password: '', confirm: '' })
+  const [errors, setErrors]      = useState({})
   const [showPass, setShowPass]  = useState(false)
   const [loading, setLoading]    = useState(false)
   const { login } = useAuth()
   const navigate  = useNavigate()
 
-  const set = (k) => (e) => setForm(p => ({ ...p, [k]: e.target.value }))
+  const set = (k) => (e) => {
+    setForm(p => ({ ...p, [k]: e.target.value }))
+    setErrors(p => ({ ...p, [k]: '' }))
+  }
+
+  const validateEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)
+  const validatePhone = (v) => /^\+?[1-9]\d{6,14}$/.test(v.replace(/[\s\-]/g, ''))
+
+  const validate = () => {
+    const e = {}
+    if (!form.name.trim())               e.name    = 'Full name is required.'
+    if (!form.email)                     e.email   = 'Email is required.'
+    else if (!validateEmail(form.email)) e.email   = 'Enter a valid email address.'
+    if (!form.phone)                     e.phone   = 'Phone number is required.'
+    else if (!validatePhone(form.phone)) e.phone   = 'Enter a valid phone number (e.g. +1234567890).'
+    if (!form.password)                  e.password = 'Password is required.'
+    else if (form.password.length < 8)   e.password = 'Password must be at least 8 characters.'
+    if (!form.confirm)                   e.confirm  = 'Please confirm your password.'
+    else if (form.password !== form.confirm) e.confirm = 'Passwords do not match.'
+    return e
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (form.password !== form.confirm) return toast.error('Passwords do not match.')
-    if (form.password.length < 8) return toast.error('Password must be at least 8 characters.')
+    const errs = validate()
+    if (Object.keys(errs).length) return setErrors(errs)
     setLoading(true)
     try {
-      const { data } = await authApi.register({ name: form.name, email: form.email, password: form.password })
+      const { data } = await authApi.register({ name: form.name, email: form.email, phone: form.phone, password: form.password })
       login(data.token, data.user)
       toast.success(`Account created! Welcome, ${data.user.name}!`)
       navigate('/')
@@ -65,37 +86,50 @@ export default function Signup() {
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="auth-field">
             <label>Full Name</label>
-            <div className="auth-input-wrap">
+            <div className={`auth-input-wrap${errors.name ? ' auth-input-error' : ''}`}>
               <User size={16} className="auth-input-icon" />
-              <input type="text" placeholder="Jay Shah" value={form.name} onChange={set('name')} required />
+              <input type="text" placeholder="Jay Shah" value={form.name} onChange={set('name')} />
             </div>
+            {errors.name && <span className="auth-error">{errors.name}</span>}
+          </div>
+
+          <div className="auth-field">
+            <label>Phone Number</label>
+            <div className={`auth-input-wrap${errors.phone ? ' auth-input-error' : ''}`}>
+              <Phone size={16} className="auth-input-icon" />
+              <input type="tel" placeholder="+1234567890" value={form.phone} onChange={set('phone')} />
+            </div>
+            {errors.phone && <span className="auth-error">{errors.phone}</span>}
           </div>
 
           <div className="auth-field">
             <label>Email</label>
-            <div className="auth-input-wrap">
+            <div className={`auth-input-wrap${errors.email ? ' auth-input-error' : ''}`}>
               <Mail size={16} className="auth-input-icon" />
-              <input type="email" placeholder="you@example.com" value={form.email} onChange={set('email')} required />
+              <input type="email" placeholder="you@example.com" value={form.email} onChange={set('email')} />
             </div>
+            {errors.email && <span className="auth-error">{errors.email}</span>}
           </div>
 
           <div className="auth-field">
             <label>Password</label>
-            <div className="auth-input-wrap">
+            <div className={`auth-input-wrap${errors.password ? ' auth-input-error' : ''}`}>
               <Lock size={16} className="auth-input-icon" />
-              <input type={showPass ? 'text' : 'password'} placeholder="Min. 8 characters" value={form.password} onChange={set('password')} required />
+              <input type={showPass ? 'text' : 'password'} placeholder="Min. 8 characters" value={form.password} onChange={set('password')} />
               <button type="button" className="auth-eye" onClick={() => setShowPass(p => !p)}>
                 {showPass ? <EyeOff size={15} /> : <Eye size={15} />}
               </button>
             </div>
+            {errors.password && <span className="auth-error">{errors.password}</span>}
           </div>
 
           <div className="auth-field">
             <label>Confirm Password</label>
-            <div className="auth-input-wrap">
+            <div className={`auth-input-wrap${errors.confirm ? ' auth-input-error' : ''}`}>
               <Lock size={16} className="auth-input-icon" />
-              <input type={showPass ? 'text' : 'password'} placeholder="Repeat password" value={form.confirm} onChange={set('confirm')} required />
+              <input type={showPass ? 'text' : 'password'} placeholder="Repeat password" value={form.confirm} onChange={set('confirm')} />
             </div>
+            {errors.confirm && <span className="auth-error">{errors.confirm}</span>}
           </div>
 
           <button className="auth-submit-btn" type="submit" disabled={loading}>

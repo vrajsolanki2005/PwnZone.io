@@ -13,7 +13,7 @@ export default function AuthCallback() {
     if (!token) { navigate('/login'); return }
     localStorage.setItem('token', token)
     authApi.me()
-      .then(r => { login(token, r.data); navigate('/') })
+      .then(r => { login(token, r.data); navigate(r.data.phone ? '/' : '/complete-profile') })
       .catch(() => navigate('/login'))
   }, [])
 

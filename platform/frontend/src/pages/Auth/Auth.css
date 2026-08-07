@@ -149,6 +149,14 @@
 }
 
 .auth-input-wrap:focus-within { border-color: var(--clr-purple-1); }
+.auth-input-error { border-color: #f87171 !important; }
+
+.auth-error {
+  font-family: var(--font-secondary);
+  font-size: var(--text-caption);
+  color: #f87171;
+  margin-top: 2px;
+}
 
 .auth-input-icon { color: var(--clr-text-muted); flex-shrink: 0; }
 

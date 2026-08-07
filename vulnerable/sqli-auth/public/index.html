@@ -205,7 +205,7 @@
     <div class="logo">
       <div class="logo-icon">🏢</div>
       <div>
-        <div class="logo-text">AcmeCorp</div>
+        <div class="logo-text">PWNZone.io</div>
         <div class="logo-sub">Employee Portal</div>
       </div>
     </div>
@@ -285,7 +285,8 @@
     submitBtn.textContent = 'Signing in…';
 
     try {
-      const res  = await fetch('/login', {
+      const base = window.location.pathname.replace(/\/login$/, '') || '';
+      const res  = await fetch(base + '/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),

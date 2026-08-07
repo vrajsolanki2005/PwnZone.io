@@ -3,12 +3,20 @@ const { register, getMe, logout } = require('../services/authService');
 const { sign } = require('../services/jwtService');
 
 //registerUser
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const PHONE_RE = /^\+?[1-9]\d{6,14}$/;
+
 const registerUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
-    if (!name || !email || !password)
+    const { name, email, password, phone } = req.body;
+    if (!name || !email || !password || !phone)
       return res.status(400).json({ message: 'All fields are required.' });
-    const result = await register({ name, email, password });
+    if (!EMAIL_RE.test(email))
+      return res.status(400).json({ message: 'Invalid email address.' });
+    const normalizedPhone = phone.replace(/[\s\-]/g, '');
+    if (!PHONE_RE.test(normalizedPhone))
+      return res.status(400).json({ message: 'Invalid phone number.' });
+    const result = await register({ name, email, password, phone: normalizedPhone });
     res.status(201).json(result);
   } catch (err) {
     res.status(err.status || 500).json({ message: err.message });

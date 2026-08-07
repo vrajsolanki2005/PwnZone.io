@@ -7,7 +7,7 @@ const app = express();
 const PORT = 5174;
 const FLAG = 'FLAG{tm-01-sql-injection}';
 
-app.use(cors());
+app.use(cors({ origin: '*' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
