@@ -252,7 +252,7 @@
     <p style="font-size:12px;color:#64748b;margin-bottom:12px;">
       Submit this flag on the PwnZone platform to earn your points.
     </p>
-    <button class="back-btn" onclick="window.close()">← Return to PwnZone</button>
+    <button class="back-btn" onclick="goBack()">← Return to PwnZone</button>
   </div>
 
 </div>
@@ -324,6 +324,16 @@
       submitBtn.textContent = 'Sign In';
     }
   });
+
+  function goBack() {
+    const params = new URLSearchParams(window.location.search);
+    const returnUrl = params.get('returnUrl');
+    if (returnUrl) {
+      window.location.href = returnUrl;
+    } else {
+      window.history.back();
+    }
+  }
 
   function copyFlag() {
     const flag = document.getElementById('flag-display').textContent;

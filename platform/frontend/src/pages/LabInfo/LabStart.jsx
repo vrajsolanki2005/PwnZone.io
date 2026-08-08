@@ -15,6 +15,7 @@ export default function LabStart() {
         const base = labUrl.startsWith('http') ? labUrl : window.location.origin + labUrl
         const url = new URL(base)
         if (token) url.searchParams.set('token', token)
+        url.searchParams.set('returnUrl', `${window.location.origin}/labs/${slug}`)
         window.location.href = url.toString()
       })
       .catch(() => setError(true))
