@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const pool = require('../config/db');
 const LabProgress = require('../models/LabProgress');
 const Lab = require('../models/Lab');
@@ -38,6 +39,27 @@ async function updateStreak(userId) {
 }
 
 const HINT_PENALTY = 10;
+
+const createSession = async (userId, slug) => {
+  const lab = await Lab.findBySlug(slug);
+  if (!lab) { const e = new Error('Lab not found.'); e.status = 404; throw e; }
+
+  const existing = await LabProgress.findOne(userId, lab.id);
+  if (existing?.status === 'COMPLETED')
+    return { lab_url: lab.lab_url, session_id: null, alreadyCompleted: true };
+
+  await LabProgress.startLab(userId, lab.id);
+
+  const sessionId = crypto.randomBytes(32).toString('hex');
+  await pool.query(
+    `INSERT INTO lab_sessions (id, user_id, lab_id, expires_at)
+     VALUES (?, ?, ?, DATE_ADD(NOW(), INTERVAL 4 HOUR))
+     ON DUPLICATE KEY UPDATE id = id`,
+    [sessionId, userId, lab.id]
+  );
+
+  return { lab_url: lab.lab_url, session_id: sessionId, alreadyCompleted: false };
+};
 
 const unlockHint = async (userId, slug) => {
   const record = await Lab.findFlag(slug);
@@ -208,4 +230,4 @@ const getRecommendations = async (userId) => {
   return scored.slice(0, 6).map(({ _score, ...lab }) => lab);
 };
 
-module.exports = { completeLab, submitFlag, unlockHint, getUserStats, getRecentCompletions, getProgressMap, getRecommendations };
+module.exports = { createSession, completeLab, submitFlag, unlockHint, getUserStats, getRecentCompletions, getProgressMap, getRecommendations };

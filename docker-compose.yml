@@ -65,5 +65,11 @@ services:
     expose:
       - "5174"
 
+  xss-search:                         # tm-41
+    build: ./vulnerable/xss-search
+    restart: always
+    expose:
+      - "5175"
+
 volumes:
   db_data:

@@ -55,9 +55,12 @@ CREATE TABLE IF NOT EXISTS user_lab_progress (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     lab_id INT NOT NULL,
-    status ENUM('PENDING','COMPLETED') NOT NULL DEFAULT 'PENDING',
+    status ENUM('PENDING','IN_PROGRESS','COMPLETED') NOT NULL DEFAULT 'PENDING',
     points_earned INT NOT NULL DEFAULT 0,
+    started_at TIMESTAMP NULL DEFAULT NULL,
+    last_accessed_at TIMESTAMP NULL DEFAULT NULL,
     completed_at TIMESTAMP NULL DEFAULT NULL,
+    attempts INT NOT NULL DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     current_streak INT NOT NULL DEFAULT 0,
@@ -67,4 +70,15 @@ CREATE TABLE IF NOT EXISTS user_lab_progress (
     UNIQUE KEY uq_user_lab (user_id, lab_id),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (lab_id) REFERENCES labs(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS lab_sessions (
+    id VARCHAR(64) PRIMARY KEY,
+    user_id INT NOT NULL,
+    lab_id INT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (lab_id)  REFERENCES labs(id)  ON DELETE CASCADE,
+    INDEX idx_user_lab (user_id, lab_id)
 );

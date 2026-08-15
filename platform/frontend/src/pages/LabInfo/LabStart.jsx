@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { labApi } from '../../services/api'
+import { progressApi } from '../../services/api'
 
 export default function LabStart() {
   const { slug }    = useParams()
@@ -8,12 +8,13 @@ export default function LabStart() {
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    labApi.getOne(slug)
+    progressApi.startSession(slug)
       .then(r => {
-        const labUrl = r.data.lab_url
-        const token = localStorage.getItem('token')
-        const base = labUrl.startsWith('http') ? labUrl : window.location.origin + labUrl
+        const { lab_url, session_id } = r.data
+        const base = lab_url.startsWith('http') ? lab_url : window.location.origin + lab_url
         const url = new URL(base)
+        if (session_id) url.searchParams.set('session', session_id)
+        const token = localStorage.getItem('token')
         if (token) url.searchParams.set('token', token)
         url.searchParams.set('returnUrl', `${window.location.origin}/labs/${slug}`)
         window.location.href = url.toString()

@@ -33,13 +33,14 @@ export const labApi = {
 }
 
 export const progressApi = {
-  complete:        (labId) => api.post(`/progress/${labId}/complete`),
-  submitFlag:      (slug, flag) => api.post(`/progress/${slug}/flag`, { flag }),
-  unlockHint:      (slug) => api.post(`/progress/${slug}/hint`),
-  stats:           ()      => api.get('/progress/stats'),
-  recent:          ()      => api.get('/progress/recent'),
-  map:             ()      => api.get('/progress/map'),
-  recommendations: ()      => api.get('/progress/recommendations'),
+  startSession:    (slug)        => api.post(`/progress/${slug}/session`),
+  complete:        (labId)       => api.post(`/progress/${labId}/complete`),
+  submitFlag:      (slug, flag)  => api.post(`/progress/${slug}/flag`, { flag }),
+  unlockHint:      (slug)        => api.post(`/progress/${slug}/hint`),
+  stats:           ()            => api.get('/progress/stats'),
+  recent:          ()            => api.get('/progress/recent'),
+  map:             ()            => api.get('/progress/map'),
+  recommendations: ()            => api.get('/progress/recommendations'),
 }
 
 export const userApi = {

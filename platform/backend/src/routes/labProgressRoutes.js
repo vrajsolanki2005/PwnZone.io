@@ -1,6 +1,9 @@
 const router = require('express').Router();
 const auth   = require('../middleware/authMiddleware');
-const { complete, flagSubmit, hintUnlock, stats, recent, progressMap, recommendations } = require('../controllers/labProgressController');
+const { sessionStart, complete, flagSubmit, hintUnlock, stats, recent, progressMap, recommendations } = require('../controllers/labProgressController');
+
+// POST /api/progress/:slug/session  — start lab, create session
+router.post('/:slug/session', auth, sessionStart);
 
 // POST /api/progress/:labId/complete
 router.post('/:labId/complete', auth, complete);

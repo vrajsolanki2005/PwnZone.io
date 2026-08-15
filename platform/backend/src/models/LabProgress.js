@@ -17,13 +17,27 @@ const LabProgress = {
     return rows[0] || null;
   },
 
+  async startLab(userId, labId) {
+    await pool.query(
+      `INSERT INTO user_lab_progress (user_id, lab_id, status, started_at, last_accessed_at, attempts)
+       VALUES (?, ?, 'IN_PROGRESS', NOW(), NOW(), 1) AS new_row
+       ON DUPLICATE KEY UPDATE
+         status           = IF(status = 'COMPLETED', status, 'IN_PROGRESS'),
+         started_at       = IF(started_at IS NULL, NOW(), started_at),
+         last_accessed_at = NOW(),
+         attempts         = attempts + 1,
+         updated_at       = NOW()`,
+      [userId, labId]
+    );
+  },
+
   async complete(userId, labId, points) {
     await pool.query(
       `INSERT INTO user_lab_progress (user_id, lab_id, status, points_earned, completed_at)
-       VALUES (?, ?, 'COMPLETED', ?, NOW())
+       VALUES (?, ?, 'COMPLETED', ?, NOW()) AS new_row
        ON DUPLICATE KEY UPDATE
          status        = IF(status = 'COMPLETED', status, 'COMPLETED'),
-         points_earned = IF(status = 'COMPLETED', points_earned, VALUES(points_earned)),
+         points_earned = IF(status = 'COMPLETED', points_earned, new_row.points_earned),
          completed_at  = IF(status = 'COMPLETED', completed_at, NOW()),
          updated_at    = NOW()`,
       [userId, labId, points]

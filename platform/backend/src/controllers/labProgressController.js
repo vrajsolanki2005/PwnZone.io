@@ -1,4 +1,5 @@
 const {
+  createSession,
   completeLab,
   submitFlag,
   unlockHint,
@@ -7,6 +8,16 @@ const {
   getProgressMap,
   getRecommendations,
 } = require('../services/labProgressService');
+
+const sessionStart = async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const result = await createSession(req.user.id, slug);
+    res.json(result);
+  } catch (err) {
+    res.status(err.status || 500).json({ message: err.message });
+  }
+};
 
 const complete = async (req, res) => {
   try {
@@ -72,4 +83,4 @@ const hintUnlock = async (req, res) => {
   }
 };
 
-module.exports = { complete, flagSubmit, hintUnlock, stats, recent, progressMap, recommendations };
+module.exports = { sessionStart, complete, flagSubmit, hintUnlock, stats, recent, progressMap, recommendations };

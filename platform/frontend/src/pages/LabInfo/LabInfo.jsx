@@ -243,11 +243,16 @@ export default function LabInfo() {
   }, [lab])
 
   useEffect(() => {
-    if (!lab?.lab_url?.startsWith('http')) return
+    if (!lab?.lab_url) return
     const ctrl = new AbortController()
     const timer = setTimeout(() => ctrl.abort(), 4000)
-    const origin = new URL(lab.lab_url).origin
-    fetch(`${origin}/health`, { signal: ctrl.signal })
+    const labPath = lab.lab_url.startsWith('http')
+      ? new URL(lab.lab_url).origin
+      : window.location.origin
+    const healthPath = lab.lab_url.startsWith('http')
+      ? `${new URL(lab.lab_url).origin}/health`
+      : lab.lab_url.replace(/\/[^/]+$/, '/health')
+    fetch(healthPath, { signal: ctrl.signal })
       .then(r => setLabOnline(r.ok))
       .catch(() => setLabOnline(false))
       .finally(() => clearTimeout(timer))
@@ -438,7 +443,7 @@ export default function LabInfo() {
       {/* Actions */}
       <motion.div variants={fadeUp}>
         <div className="li-actions">
-          {lab.lab_url?.startsWith('http') && (
+          {lab.lab_url && (
             <div className="li-server-status">
               <span className={`li-server-dot ${
                 labOnline === null ? 'li-server-dot--checking' :
@@ -451,7 +456,7 @@ export default function LabInfo() {
           <button
             className="li-btn li-btn--primary"
             onClick={() => navigate(`/labs/${slug}/start`)}
-            disabled={lab.lab_url?.startsWith('http') && labOnline === false}
+            disabled={labOnline === false}
           >
             <Play size={14} /> Launch Lab
           </button>
