@@ -166,6 +166,85 @@ app.get('/search', (req, res) => {
 </html>`);
 });
 
+app.get('/flag', (req, res) => {
+  const returnUrl = req.query.returnUrl || '/';
+  res.send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Flag Captured — ShopZone</title>
+  <style>${CSS}</style>
+  <style>
+    .flag-card {
+      max-width: 480px; margin: 80px auto; background: #1a1d27;
+      border: 1px solid #2d3148; border-radius: 16px; padding: 40px 36px;
+      text-align: center;
+    }
+    .flag-icon { font-size: 52px; margin-bottom: 16px; }
+    .flag-title { font-size: 22px; font-weight: 700; color: #f1f5f9; margin-bottom: 8px; }
+    .flag-sub   { font-size: 13px; color: #64748b; margin-bottom: 28px; }
+    .flag-box {
+      background: #0f1117; border: 1px solid #22c55e;
+      border-radius: 10px; padding: 16px 20px; margin-bottom: 16px;
+    }
+    .flag-label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+    .flag-value { font-family: monospace; font-size: 17px; font-weight: 700; color: #22c55e; letter-spacing: 1px; word-break: break-all; }
+    .copy-btn {
+      background: rgba(34,197,94,.12); border: 1px solid rgba(34,197,94,.3);
+      color: #86efac; border-radius: 6px; padding: 8px 18px;
+      font-size: 12px; font-weight: 600; cursor: pointer; margin-bottom: 20px;
+    }
+    .copy-btn:hover { background: rgba(34,197,94,.22); }
+    .submit-btn {
+      display: block; width: 100%; padding: 12px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      border: none; border-radius: 8px; color: #fff;
+      font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: none;
+    }
+    .submit-btn:hover { opacity: .88; }
+    .payload-box {
+      background: rgba(99,102,241,.08); border: 1px solid rgba(99,102,241,.2);
+      border-radius: 8px; padding: 12px 14px; font-size: 12px;
+      color: #a5b4fc; text-align: left; margin-bottom: 20px; font-family: monospace;
+    }
+    .payload-box strong { display: block; font-size: 11px; color: #c7d2fe; text-transform: uppercase; letter-spacing: .4px; margin-bottom: 4px; }
+  </style>
+</head>
+<body>
+  <div class="flag-card">
+    <div class="flag-icon">🎉</div>
+    <div class="flag-title">XSS Executed!</div>
+    <div class="flag-sub">You successfully injected a script into the search parameter.</div>
+
+    <div class="flag-box">
+      <div class="flag-label">🚩 Your Flag</div>
+      <div class="flag-value" id="flag-val">${FLAG}</div>
+    </div>
+
+    <button class="copy-btn" onclick="copyFlag()">📋 Copy Flag</button>
+
+    <div class="payload-box">
+      <strong>Vulnerability</strong>
+      The <code>q</code> parameter is reflected unsanitized into the HTML response.
+    </div>
+
+    <a class="submit-btn" href="${returnUrl}">Submit Flag on PwnZone →</a>
+  </div>
+
+  <script>
+    function copyFlag() {
+      navigator.clipboard.writeText(document.getElementById('flag-val').textContent).then(() => {
+        const btn = document.querySelector('.copy-btn');
+        btn.textContent = '✅ Copied!';
+        setTimeout(() => btn.textContent = '📋 Copy Flag', 2000);
+      });
+    }
+  <\/script>
+</body>
+</html>`);
+});
+
 app.get('/', (req, res) => res.redirect(`${BASE}/search`));
 
 app.get('/health', (_, res) => res.json({ status: 'ok', lab: 'xss-search' }));
